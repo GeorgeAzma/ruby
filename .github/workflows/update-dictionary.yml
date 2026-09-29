@@ -1,14 +1,18 @@
-# Keeps the JMdict data current, as its licence requires. Every three months (or on demand from the
-# Actions tab) this rebuilds dict/jmdict.json from the latest JMdict, raises the version, commits,
-# and builds ruby.zip. Then either:
-#   - with the CWS_* secrets set (see README.md), it publishes the update to the Chrome Web Store, or
-#   - without them, it attaches ruby.zip to a GitHub release and opens an issue that notifies you,
+# Keeps the JMdict data current, as its licence requires.
+#
+# Monthly: rebuilds dict/jmdict.json from the latest JMdict and commits it. (GitHub disables scheduled
+# workflows in public repositories after 60 days without activity, so a quarterly-only run would
+# switch itself off.)
+# Every three months (and when run by hand from the Actions tab), also raises the version, builds
+# ruby.zip, and then either:
+#   - with the CWS_* secrets set (see README.md), publishes the update to the Chrome Web Store, or
+#   - without them, attaches ruby.zip to a GitHub release and opens an issue that notifies you,
 #     so you only have to upload the file in the developer dashboard.
 name: Update dictionary
 
 on:
   schedule:
-    - cron: '0 6 1 1,4,7,10 *' # 06:00 UTC on Jan 1, Apr 1, Jul 1 and Oct 1
+    - cron: '0 6 1 * *' # 06:00 UTC on the 1st of every month
   workflow_dispatch:
 
 permissions:
@@ -31,12 +35,18 @@ jobs:
         run: node tools/build-dict.js
 
       - name: Check for changes
-        id: diff
+        id: check
         run: |
           if git diff --quiet dict/jmdict.json; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+          # Store releases in January, April, July and October, or whenever run by hand
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [[ " 01 04 07 10 " == *" $(date -u +%m) "* ]]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Raise version
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.check.outputs.changed == 'true' && steps.check.outputs.release == 'true'
         run: |
           node -e '
             const fs = require("fs");
@@ -45,22 +55,22 @@ jobs:
             fs.writeFileSync("manifest.json", s);
             console.log(JSON.parse(s).version);
           '
-          echo "VERSION=$(node -p 'require("./manifest.json").version')" >> "$GITHUB_ENV"
 
       - name: Commit
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.check.outputs.changed == 'true'
         run: |
+          echo "VERSION=$(node -p 'require("./manifest.json").version')" >> "$GITHUB_ENV"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Update JMdict dictionary data (v$VERSION)"
+          git commit -am "Update JMdict dictionary data"
           git push
 
       - name: Build package
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.check.outputs.changed == 'true' && steps.check.outputs.release == 'true'
         run: zip -r -q ruby.zip manifest.json src lib dict icons THIRD_PARTY_NOTICES.md
 
       - name: Publish to the Chrome Web Store
-        if: steps.diff.outputs.changed == 'true' && env.AUTO_PUBLISH == 'true'
+        if: steps.check.outputs.changed == 'true' && steps.check.outputs.release == 'true' && env.AUTO_PUBLISH == 'true'
         run: node tools/publish.js ruby.zip
         env:
           CWS_SERVICE_ACCOUNT_KEY: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
@@ -68,7 +78,7 @@ jobs:
           CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
 
       - name: Prepare manual upload
-        if: steps.diff.outputs.changed == 'true' && env.AUTO_PUBLISH != 'true'
+        if: steps.check.outputs.changed == 'true' && steps.check.outputs.release == 'true' && env.AUTO_PUBLISH != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

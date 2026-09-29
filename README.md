@@ -43,8 +43,10 @@ node tools/build-dict.js
 This downloads the latest JMdict, regenerates `dict/jmdict.json` and records the JMdict version in
 `THIRD_PARTY_NOTICES.md`.
 
-The **Update dictionary** GitHub Action does this every three months, and on demand from the Actions
-tab. It rebuilds the dictionary, raises the version, commits, and builds `ruby.zip`. Then:
+The **Update dictionary** GitHub Action rebuilds and commits the dictionary every month (which also keeps
+GitHub from disabling the schedule, as it does after 60 idle days in public repositories). Every three
+months, and when run by hand from the Actions tab, it also raises the version and builds `ruby.zip`.
+Then:
 
 - **By default** it attaches `ruby.zip` to a GitHub release and opens an issue that notifies you.
   Upload the file in the Chrome Web Store dashboard (Package > Upload new package) and submit it.
