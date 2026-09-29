@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Ruby: Inline Translate Japanese",
+  "short_name": "Ruby",
+  "version": "1.0.0",
+  "description": "English translations or furigana right above every Japanese word, on any website. Private and fully offline.",
+  "minimum_chrome_version": "110",
+
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+
+  "action": {
+    "default_title": "Ruby: Inline Translate Japanese",
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
+  },
+
+  "permissions": [
+    "storage"
+  ],
+
+  "background": {
+    "service_worker": "src/background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+
+  "commands": {
+    "toggle": {
+      "suggested_key": { "default": "Alt+J" },
+      "description": "Toggle translations on this page"
+    },
+    "furigana": {
+      "suggested_key": { "default": "Alt+K" },
+      "description": "Switch between English and furigana"
+    },
+    "reveal": {
+      "suggested_key": { "default": "Alt+H" },
+      "description": "Show annotations only on hover (on/off)"
+    }
+  }
+}

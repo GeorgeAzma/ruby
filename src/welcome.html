@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome to Ruby</title>
+<link rel="stylesheet" href="content.css">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f2f2f7;
+    --card: #ffffff;
+    --label: #1c1c1e;
+    --secondary: rgba(60, 60, 67, 0.6);
+    --fill: rgba(118, 118, 128, 0.12);
+    --accent: #de2c5f;
+    --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1e;
+      --card: #2c2c2e;
+      --label: #ffffff;
+      --secondary: rgba(235, 235, 245, 0.6);
+      --fill: rgba(118, 118, 128, 0.24);
+      --accent: #ff6189;
+      --card-shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; padding: 56px 16px; background: var(--bg); color: var(--label);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 520px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 28px; }
+  header img { width: 72px; height: 72px; filter: drop-shadow(0 6px 14px rgba(192, 31, 75, 0.3)); }
+  h1 { margin: 14px 0 4px; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+  header p { margin: 0; color: var(--secondary); }
+  .card { margin-bottom: 14px; padding: 20px 22px; border-radius: 16px; background: var(--card); box-shadow: var(--card-shadow); }
+  .preview { font-size: 28px; line-height: 2.2; text-align: center; }
+  h2 { margin: 0 0 10px; font-size: 17px; font-weight: 600; }
+  ul { margin: 0; padding-left: 20px; }
+  li + li { margin-top: 8px; }
+  button {
+    display: block; width: 100%; margin-top: 20px; padding: 13px; border: 0; border-radius: 12px;
+    background: var(--accent); color: #fff; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer;
+  }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .fine { margin: 12px 0 0; font-size: 13px; color: var(--secondary); text-align: center; }
+  .done { text-align: center; }
+  .check { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #34c759; color: #fff; font-size: 24px; }
+  .keys { display: grid; gap: 10px; margin-top: 16px; text-align: left; }
+  .keys div { display: flex; justify-content: space-between; gap: 12px; }
+  kbd { padding: 2px 8px; border-radius: 7px; background: var(--fill); color: var(--secondary); font-family: inherit; font-size: 13px; font-weight: 500; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="../icons/128.png" alt="">
+    <h1>Welcome to Ruby</h1>
+    <p>English or furigana above Japanese words, as you read.</p>
+  </header>
+
+  <div class="card preview" lang="ja" aria-hidden="true">
+    <ruby class="jr"><ruby class="jf">日本語<rt data-t="にほんご"></rt></ruby><rt data-t="Japanese"></rt></ruby>を<ruby class="jr"><ruby class="jf">勉強<rt data-t="べんきょう"></rt></ruby>する<rt data-t="study"></rt></ruby>
+  </div>
+
+  <section class="card" id="consent">
+    <h2>Before you start</h2>
+    <ul>
+      <li>Ruby reads the text of the web pages you visit so it can find Japanese and show English or furigana above it.</li>
+      <li>This happens entirely on your device. Page text is never saved, logged or sent anywhere, and Ruby makes no network requests.</li>
+      <li>Ruby saves only your display settings, in your browser.</li>
+    </ul>
+    <button id="agree">Agree and start</button>
+    <p class="fine">Until you agree, Ruby stays off. You can remove it any time at chrome://extensions.</p>
+  </section>
+
+  <section class="card done" id="done" hidden>
+    <span class="check">✓</span>
+    <h2 style="margin-top: 12px">You're all set</h2>
+    <p class="fine" style="margin-top: 0">Open any Japanese page. Tabs that were already open need a reload.</p>
+    <div class="keys">
+      <div><span>Show or hide on a page</span><kbd data-command="toggle"></kbd></div>
+      <div><span>Switch English and furigana</span><kbd data-command="furigana"></kbd></div>
+      <div><span>Show annotations only on hover</span><kbd data-command="reveal"></kbd></div>
+    </div>
+  </section>
+</main>
+<script src="welcome.js"></script>
+</body>
+</html>

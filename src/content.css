@@ -1,0 +1,56 @@
+/* ruby.jr wraps a word and holds its English gloss; ruby.jf inside it holds furigana for a kanji run.
+   Only one of the two is shown; .jr-h (hovered word) shows the other one. In reveal mode
+   (html[data-jr-reveal]) annotations are invisible until their word is hovered (.jr-v).
+   --jr-size (the size setting) scales annotations relative to the Japanese text, with a readable minimum. */
+
+ruby.jr,
+ruby.jf {
+  ruby-position: over;
+  ruby-align: center;
+}
+
+ruby.jr > rt,
+ruby.jf > rt {
+  display: revert;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
+  text-indent: 0;
+  white-space: nowrap;
+  user-select: none;
+  opacity: 0.85;
+}
+
+ruby.jr > rt {
+  font-family: system-ui, sans-serif;
+  font-size: max(calc(var(--jr-size, 0.6) * 1em), 10px);
+  padding-inline: 0.3em; /* keeps neighbouring translations apart */
+}
+
+ruby.jf > rt {
+  font-size: max(calc(var(--jr-size, 0.6) * 0.85em), 9px);
+}
+
+ruby.jr > rt::before,
+ruby.jf > rt::before {
+  content: attr(data-t);
+}
+
+/* opacity rather than display, so revealing an annotation doesn't move the text around it */
+html[data-jr-reveal] ruby.jr rt {
+  transition: opacity 0.12s;
+}
+
+html[data-jr-reveal] ruby.jr:not(.jr-v) rt {
+  opacity: 0;
+}
+
+html:not([data-jr-furigana]) ruby.jr:not(.jr-h) ruby.jf > rt,
+html:not([data-jr-furigana]) ruby.jr.jr-h > rt,
+html[data-jr-furigana] ruby.jr:not(.jr-h) > rt,
+html[data-jr-furigana] ruby.jr.jr-h ruby.jf > rt {
+  display: none;
+}
