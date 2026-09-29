@@ -1,7 +1,9 @@
-# Keeps the JMdict data current, as its licence requires: every three months (or on demand) this
-# rebuilds dict/jmdict.json from the latest JMdict, raises the version, commits, and publishes the
-# update to the Chrome Web Store. Needs the secrets described in README.md. If publishing fails,
-# GitHub emails you about the failed run.
+# Keeps the JMdict data current, as its licence requires. Every three months (or on demand from the
+# Actions tab) this rebuilds dict/jmdict.json from the latest JMdict, raises the version, commits,
+# and builds ruby.zip. Then either:
+#   - with the CWS_* secrets set (see README.md), it publishes the update to the Chrome Web Store, or
+#   - without them, it attaches ruby.zip to a GitHub release and opens an issue that notifies you,
+#     so you only have to upload the file in the developer dashboard.
 name: Update dictionary
 
 on:
@@ -11,10 +13,13 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    env:
+      AUTO_PUBLISH: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -40,13 +45,14 @@ jobs:
             fs.writeFileSync("manifest.json", s);
             console.log(JSON.parse(s).version);
           '
+          echo "VERSION=$(node -p 'require("./manifest.json").version')" >> "$GITHUB_ENV"
 
       - name: Commit
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Update JMdict dictionary data"
+          git commit -am "Update JMdict dictionary data (v$VERSION)"
           git push
 
       - name: Build package
@@ -54,9 +60,19 @@ jobs:
         run: zip -r -q ruby.zip manifest.json src lib dict icons THIRD_PARTY_NOTICES.md
 
       - name: Publish to the Chrome Web Store
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.diff.outputs.changed == 'true' && env.AUTO_PUBLISH == 'true'
         run: node tools/publish.js ruby.zip
         env:
           CWS_SERVICE_ACCOUNT_KEY: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
           CWS_PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
           CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+
+      - name: Prepare manual upload
+        if: steps.diff.outputs.changed == 'true' && env.AUTO_PUBLISH != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$VERSION" ruby.zip --title "v$VERSION: dictionary update" \
+            --notes "Updated JMdict data. Upload ruby.zip in the Chrome Web Store developer dashboard (Package > Upload new package), then submit it for review."
+          gh issue create --title "Upload v$VERSION to the Chrome Web Store" \
+            --body "@${{ github.repository_owner }} The dictionary was updated. Download ruby.zip from the [v$VERSION release](${{ github.server_url }}/${{ github.repository }}/releases/tag/v$VERSION), upload it in the Chrome Web Store developer dashboard (Package > Upload new package), submit it for review, then close this issue."

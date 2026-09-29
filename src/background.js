@@ -63,6 +63,7 @@ const PHRASES = [
 const STEM_ENDINGS = { い: 'う', き: 'く', ぎ: 'ぐ', し: 'す', ち: 'つ', に: 'ぬ', び: 'ぶ', み: 'む', り: 'る' };
 const POTENTIAL_ENDINGS = { え: 'う', け: 'く', げ: 'ぐ', せ: 'す', て: 'つ', ね: 'ぬ', べ: 'ぶ', め: 'む', れ: 'る' };
 const HONORIFIC_VERB = /^(?:いただ|頂|くださ|下さ|なさ)/;
+const isHonorific = (x) => x && x.pos === '接頭詞' && /^(お|ご|御)$/.test(x.surface_form);
 // お+stem before one of these is a verb: お待ちください, お送りします
 const beforeHonorificVerb = (x) => x && (HONORIFIC_VERB.test(x.surface_form) || /^(する|いたす|致す)$/.test(x.basic_form));
 // Day of the week in dates: ３月１４日（金）
@@ -222,7 +223,7 @@ function glossOf(dict, t, prev, next) {
   }
   if (t.pos === '助動詞') return { ない: 'not', ぬ: 'not', ん: 'not', たい: 'want to' }[t.basic_form] || '';
   if (t.pos === '形容詞' && t.basic_form === 'ない') return 'not';
-  if (t.pos === '接頭詞' && /^(お|ご|御)$/.test(s)) return ''; // honorific prefix
+  if (isHonorific(t)) return '';
   if (t.pos_detail_2 === '助動詞語幹') {
     // おいしそう "looks", but after a plain form そう is hearsay: 多いそう, 降るそう
     if (s === 'そう') return prev && prev.conjugated_form === '基本形' ? 'reportedly' : 'looks';
@@ -331,7 +332,6 @@ function analyze(tokenizer, dict, text, pre, post) {
     }
     let n = 1, gloss = '', read = ''; // read: dictionary reading for the first n tokens, if the tokenizer's is unreliable
 
-    const isHonorific = (x) => x && x.pos === '接頭詞' && /^(お|ご|御)$/.test(x.surface_form);
     const inNumber = t.pos_detail_1 === '数' && prev && prev.pos_detail_1 === '数';
     let digits = 0; // length of a run of number tokens starting here
     while (!inNumber && toks[i + digits] && toks[i + digits].pos_detail_1 === '数') digits++;
