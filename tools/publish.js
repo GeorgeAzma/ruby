@@ -2,10 +2,17 @@
 //
 //   node tools/publish.js ruby.zip
 //
-// Environment (GitHub Actions secrets, see README.md):
-//   CWS_SERVICE_ACCOUNT_KEY  JSON key of a service account added in the developer dashboard (Account)
+// Used by the Update dictionary workflow when these repository secrets are set (Settings > Secrets
+// and variables > Actions); without them the workflow prepares a manual upload instead.
+//   CWS_SERVICE_ACCOUNT_KEY  JSON key of the service account
 //   CWS_PUBLISHER_ID         Developer dashboard > Publisher > Settings
-//   CWS_EXTENSION_ID         The item's ID
+//   CWS_EXTENSION_ID         The extension's ID
+//
+// One-time setup, after the first version is live in the store:
+//   1. Google Cloud Console: create a project, enable the Chrome Web Store API, create a service
+//      account, and download a JSON key for it.
+//   2. Chrome Web Store developer dashboard > Account: add the service account's email.
+//   3. Add the three secrets above to the GitHub repository.
 // API reference: https://developer.chrome.com/docs/webstore/using-api
 
 const crypto = require('crypto');

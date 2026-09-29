@@ -5,7 +5,7 @@
 # switch itself off.)
 # Every three months (and when run by hand from the Actions tab), also raises the version, builds
 # ruby.zip, and then either:
-#   - with the CWS_* secrets set (see README.md), publishes the update to the Chrome Web Store, or
+#   - with the CWS_* secrets set (setup in tools/publish.js), publishes the update to the Chrome Web Store, or
 #   - without them, attaches ruby.zip to a GitHub release and opens an issue that notifies you,
 #     so you only have to upload the file in the developer dashboard.
 name: Update dictionary
