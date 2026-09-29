@@ -20,7 +20,7 @@ Ruby is a Chrome extension that shows English translations or furigana above Jap
 - It does not sell, share, or transfer any data to third parties.
 - It does not use data for any purpose other than showing annotations on the page you are reading, and never to determine creditworthiness or for lending.
 
-The popup contains a link to the dictionary's license page. That page opens only if you click the link.
+The popup and welcome page contain links to the dictionary's license and to a Ko-fi page where you can support the developer. These open only if you click them, and Ruby sends no information to them.
 
 ## Permissions
 

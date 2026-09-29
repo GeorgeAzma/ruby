@@ -1,0 +1,62 @@
+# Keeps the JMdict data current, as its licence requires: every three months (or on demand) this
+# rebuilds dict/jmdict.json from the latest JMdict, raises the version, commits, and publishes the
+# update to the Chrome Web Store. Needs the secrets described in README.md. If publishing fails,
+# GitHub emails you about the failed run.
+name: Update dictionary
+
+on:
+  schedule:
+    - cron: '0 6 1 1,4,7,10 *' # 06:00 UTC on Jan 1, Apr 1, Jul 1 and Oct 1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rebuild dictionary
+        run: node tools/build-dict.js
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet dict/jmdict.json; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Raise version
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          node -e '
+            const fs = require("fs");
+            const s = fs.readFileSync("manifest.json", "utf8")
+              .replace(/"version": "(\d+)\.(\d+)\.(\d+)"/, (m, a, b, c) => `"version": "${a}.${b}.${Number(c) + 1}"`);
+            fs.writeFileSync("manifest.json", s);
+            console.log(JSON.parse(s).version);
+          '
+
+      - name: Commit
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update JMdict dictionary data"
+          git push
+
+      - name: Build package
+        if: steps.diff.outputs.changed == 'true'
+        run: zip -r -q ruby.zip manifest.json src lib dict icons THIRD_PARTY_NOTICES.md
+
+      - name: Publish to the Chrome Web Store
+        if: steps.diff.outputs.changed == 'true'
+        run: node tools/publish.js ruby.zip
+        env:
+          CWS_SERVICE_ACCOUNT_KEY: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
+          CWS_PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
+          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}

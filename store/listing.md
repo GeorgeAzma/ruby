@@ -40,6 +40,9 @@ Change them any time at chrome://extensions/shortcuts
 GOOD TO KNOW
 Translations come from a dictionary: each word gets its most likely meaning in context, so Ruby is a reading aid rather than a full sentence translator. Names are shown in romaji.
 
+SUPPORT RUBY
+Ruby is free, with no ads or tracking. If it helps you, you can support it at ko-fi.com/lumiey
+
 CREDITS
 Dictionary: JMdict, © Electronic Dictionary Research and Development Group, used under CC BY-SA 4.0.
 Word splitting: kuromoji.js (Apache 2.0) with mecab-ipadic.
