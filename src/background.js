@@ -430,8 +430,13 @@ function analyzeCached(tokenizer, dict, [pre, text, post]) {
   return result;
 }
 
-// msg.texts: [[textBefore, text, textAfter], ...]
+// msg.texts: [[textBefore, text, textAfter], ...]; 'css': content.css for shadow roots, which it
+// doesn't reach (fetched here so the file needn't be exposed to web pages)
 chrome.runtime.onMessage.addListener((msg, sender, reply) => {
+  if (msg === 'css') {
+    fetch('/src/content.css').then((res) => res.text()).then(reply, () => reply(''));
+    return true;
+  }
   if (!msg || !msg.texts) return;
   load().then(
     ([tokenizer, dict]) => reply(msg.texts.map((t) => analyzeCached(tokenizer, dict, t))),

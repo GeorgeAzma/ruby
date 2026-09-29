@@ -120,22 +120,48 @@ function unwrap(t, restore) {
 
 function watch(t) {
   if (!kanaSeen && KANA.test(t.data)) kanaSeen = true;
-  io.observe(t.parentNode);
+  if (t.parentNode.nodeType === 1) io.observe(t.parentNode);
 }
 
+// root: an element, a text node, or a shadow root
 function scan(root) {
-  const el = root.nodeType === 1 ? root : root.parentElement;
-  if (!el || el.closest(SKIP)) return;
   if (root.nodeType === 3) {
-    if (!root.jrW && JP.test(root.data)) watch(root);
+    const el = root.parentElement;
+    if (el && !el.closest(SKIP) && !root.jrW && JP.test(root.data)) watch(root);
     return;
   }
-  if (root.nodeType !== 1) return;
+  if (root.nodeType === 1 && root.closest(SKIP)) return;
+  if (root.nodeType !== 1 && root.nodeType !== 11) return;
+  if (root.shadowRoot) watchShadow(root.shadowRoot);
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, (n) => {
     if (n.nodeType === 3) return JP.test(n.data) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
-    return n.matches(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP;
+    if (n.matches(SKIP)) return NodeFilter.FILTER_REJECT;
+    if (n.shadowRoot) watchShadow(n.shadowRoot);
+    return NodeFilter.FILTER_SKIP;
   });
   for (let n; (n = walker.nextNode()); ) watch(n);
+}
+
+// Open shadow roots (web components, and sites like Ko-fi that render posts in one) are scanned and
+// observed like the page. content.css doesn't reach inside them, so each gets a copy, with the mode
+// selectors on <html> turned into :host-context(html...).
+const MO_OPTIONS = { childList: true, subtree: true, characterData: true };
+const shadows = new Set();
+let shadowCss = null;
+function watchShadow(root) {
+  if (!shadows.has(root)) {
+    shadows.add(root);
+    if (shadows.size > 200) for (const r of shadows) if (!r.host.isConnected) shadows.delete(r);
+    shadowCss ||= send('css').then((css) => css.replace(/html((?:\[[^\]]*\]|:not\([^)]*\))*)/g, ':host-context(html$1)'));
+    shadowCss.then((css) => {
+      const style = document.createElement('style');
+      style.dataset.jr = '';
+      style.textContent = css;
+      root.append(style);
+    }, () => {});
+  }
+  mo.observe(root, MO_OPTIONS);
+  scan(root);
 }
 
 const mo = new MutationObserver((records) => {
@@ -149,7 +175,10 @@ const mo = new MutationObserver((records) => {
       }
       continue;
     }
-    for (const n of r.removedNodes) if (n.jrW) unwrap(n, true);
+    for (const n of r.removedNodes) {
+      if (n.jrW) unwrap(n, true);
+      else if (n.nodeName === 'STYLE' && 'jr' in n.dataset && r.target.nodeType === 11) r.target.append(n); // shadow root rewritten
+    }
     for (const n of r.addedNodes) {
       if (n.nodeName === 'JP-W') continue;
       // Something was inserted between an annotation and its (empty) text node: move it back
@@ -164,14 +193,17 @@ function setOn(value) {
   on = value;
   if (!document.body) return;
   if (on) {
-    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+    mo.observe(document.body, MO_OPTIONS);
     scan(document.body);
+    for (const root of shadows) watchShadow(root);
   } else {
     mo.disconnect();
     io.disconnect();
     queue = [];
     setHovered(null);
-    for (const w of document.querySelectorAll('jp-w')) if (w.jrT && w.jrT.jrW === w) unwrap(w.jrT, true);
+    for (const root of [document, ...shadows]) {
+      for (const w of root.querySelectorAll('jp-w')) if (w.jrT && w.jrT.jrW === w) unwrap(w.jrT, true);
+    }
   }
 }
 
@@ -204,7 +236,8 @@ function updateHover(e) {
 
 document.addEventListener('mouseover', (e) => {
   if (!rendered) return;
-  pointed = e.target.closest ? e.target.closest('ruby.jr') : null;
+  const target = e.composedPath()[0]; // e.target is only the host for words inside a shadow root
+  pointed = target.closest ? target.closest('ruby.jr') : null;
   updateHover(e);
 });
 document.addEventListener('mouseout', (e) => {
