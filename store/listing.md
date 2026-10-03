@@ -27,13 +27,13 @@ WHAT IT DOES
 • Optional hold key: make hovering work only while Shift, Ctrl or Alt is held.
 • Reader: paste Japanese from PDFs, apps or anywhere else and see it annotated the same way.
 • Adjustable text size, dark mode, and a clean settings panel.
-• Turn it off for a page with Alt+J.
+• Turn it off on any site with Alt+J or from the popup; Ruby remembers.
 
 FAST AND PRIVATE
 Everything runs on your computer. Ruby has its Japanese dictionary built in, so it works offline, needs no account, and never sends the pages you read anywhere. Only text near your screen is processed, so even long pages stay fast.
 
 KEYBOARD SHORTCUTS
-Alt+J: show or hide annotations on this page
+Alt+J: turn Ruby on or off for this site
 Alt+K: switch between English and furigana
 Alt+H: reveal mode (annotations only on hover)
 Open the Reader: not set by default
@@ -70,7 +70,7 @@ The store icon is taken from the package (icons/128.png).
 Shows English translations or furigana above Japanese words on the web pages the user reads.
 
 **Permission justification, storage:**
-Saves the user's display settings (English or furigana, hover behavior, hold key, text size) and whether they have agreed to the welcome page disclosure, on their device.
+Saves the user's display settings (English or furigana, hover behavior, hold key, text size), the sites where they turned Ruby off, and whether they have agreed to the welcome page disclosure, on their device.
 
 **Host permission justification:**
 
@@ -79,7 +79,7 @@ Ruby shows English translations or furigana above Japanese words on the pages th
 
 All processing happens locally: the dictionary and word splitter are bundled with the extension. Page content is never stored, logged, or sent anywhere, and the extension makes no network requests. The only data saved is the user's display settings, in chrome.storage.
 
-A narrower permission such as activeTab would not work, because it would require the user to click the extension on every page, while Ruby is meant to annotate Japanese automatically as they browse. Users can turn it off on any page with Alt+J.
+A narrower permission such as activeTab would not work, because it would require the user to click the extension on every page, while Ruby is meant to annotate Japanese automatically as they browse. Users can turn it off on any site with Alt+J or from the popup.
 ```
 
 **Remote code:** No, I am not using remote code.

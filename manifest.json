@@ -43,7 +43,7 @@
   "commands": {
     "toggle": {
       "suggested_key": { "default": "Alt+J" },
-      "description": "Toggle translations on this page"
+      "description": "Turn Ruby on or off for this site"
     },
     "furigana": {
       "suggested_key": { "default": "Alt+K" },

@@ -10,7 +10,7 @@ Ruby is a Chrome extension that shows English translations or furigana above Jap
 
 **Text you paste into the Reader.** Ruby's Reader page annotates text you paste or type into it. That text is processed on your device in the same way, stays in that browser tab, and is gone when you close it. It is never saved, logged, or sent anywhere.
 
-**Your settings.** Ruby saves your display preferences (English or furigana, hover behavior, hold key, and text size) using Chrome's local extension storage. These settings stay on your device and are removed when you uninstall Ruby. Whether Ruby is turned on for the current page is kept only in memory and resets when the page reloads.
+**Your settings.** Ruby saves your display preferences (English or furigana, hover behavior, hold key, and text size) using Chrome's local extension storage. If you turn Ruby off on a site, the site's name (for example, example.com) is saved with your settings so Ruby stays off there; turning it back on removes it. These settings stay on your device, are never sent anywhere, and are removed when you uninstall Ruby.
 
 **Your agreement.** When you install Ruby, it opens a welcome page that explains the above and asks you to agree. Ruby does not read any page until you do. Your agreement is saved with your settings.
 

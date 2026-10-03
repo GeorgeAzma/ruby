@@ -277,12 +277,16 @@ function applySettings(s) {
 
 // Nothing on the page is read until the user has agreed on the welcome page (welcome.html)
 let consented = false;
+// Sites the user turned Ruby off on (hostnames) stay off, in every tab and after reloading
+const SITE = location.hostname || location.protocol;
+let offSites = [];
 function start() {
   consented = true;
-  setOn(true);
+  setOn(!offSites.includes(SITE));
 }
 
-chrome.storage.local.get({ ...DEFAULTS, consented: false }, (s) => {
+chrome.storage.local.get({ ...DEFAULTS, consented: false, offSites: [] }, (s) => {
+  offSites = s.offSites;
   applySettings(s);
   if (s.consented) start();
 });
@@ -291,11 +295,21 @@ chrome.storage.onChanged.addListener((changes, area) => {
   const s = {};
   for (const k in changes) s[k] = changes[k].newValue;
   applySettings(s);
+  if ('offSites' in s) {
+    offSites = s.offSites || [];
+    if (consented && on === offSites.includes(SITE)) setOn(!on);
+  }
   if (s.consented && !consented) start();
 });
 
-// On/off is per page (Alt+J or the popup); both get the resulting state back
+// On/off is per site (Alt+J or the popup); both get the resulting state back
 chrome.runtime.onMessage.addListener((msg, sender, reply) => {
-  if (msg === 'toggle' && consented) setOn(!on);
-  if (msg === 'toggle' || msg === 'state') reply(on);
+  if (msg === 'toggle' && consented) {
+    setOn(!on);
+    offSites = offSites.filter((h) => h !== SITE);
+    if (!on) offSites.push(SITE);
+    chrome.storage.local.set({ offSites });
+  }
+  if (msg === 'toggle') reply(on);
+  if (msg === 'state') reply({ on, site: SITE });
 });

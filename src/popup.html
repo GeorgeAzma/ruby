@@ -62,6 +62,7 @@
   .hero .title { display: block; font-size: 15px; font-weight: 600; }
   .hero .note { display: block; margin-top: 2px; font-size: 12px; color: var(--secondary); }
   .hero .note[hidden] { display: none; }
+  .hero .site { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .hero.unavailable { cursor: default; }
   .setup button {
     flex: none; padding: 7px 14px; border: 0; border-radius: 999px; background: var(--accent); color: #fff;
@@ -181,11 +182,12 @@
 
 <label class="card hero" id="hero">
   <span class="grow">
-    <span class="title">Show on this page</span>
+    <span class="title">Show on this site</span>
+    <span class="note site" id="site" hidden></span>
     <span class="note" id="unavailable" hidden>Not available here · try reloading</span>
   </span>
   <kbd data-command="toggle"></kbd>
-  <input type="checkbox" class="switch" id="on" role="switch" aria-label="Show on this page">
+  <input type="checkbox" class="switch" id="on" role="switch" aria-label="Show on this site">
 </label>
 
 <div class="section-label"><span>Annotations</span><kbd data-command="furigana"></kbd></div>

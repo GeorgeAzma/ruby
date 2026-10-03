@@ -31,7 +31,7 @@ choose this folder.
 
 | Keys | Action |
 | --- | --- |
-| Alt+J | Show or hide annotations on the current page |
+| Alt+J | Turn Ruby on or off for the current site (remembered) |
 | Alt+K | Switch between English and furigana |
 | Alt+H | Show annotations only on hover |
 | Not set | Open the Reader |

@@ -73,7 +73,10 @@ $('setup-button').addEventListener('click', () => chrome.tabs.create({ url: chro
 
 chrome.tabs.query({ active: true, currentWindow: true }).then(async ([tab]) => {
   try {
-    $('on').checked = await chrome.tabs.sendMessage(tab.id, 'state');
+    const state = await chrome.tabs.sendMessage(tab.id, 'state');
+    $('on').checked = state.on;
+    $('site').textContent = state.site === 'file:' ? 'Local files' : state.site;
+    $('site').hidden = false;
     $('on').addEventListener('change', async () => {
       $('on').checked = await chrome.tabs.sendMessage(tab.id, 'toggle');
     });
