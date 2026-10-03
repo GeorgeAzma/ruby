@@ -27,14 +27,24 @@ function rt(text) {
   return el;
 }
 
-// One line of text as the same markup content.js puts in pages
-function paragraph(segs) {
+// A paragraph as the same markup content.js puts in pages, with its line breaks (offsets into the
+// text) put back between words. A break inside a word is dropped, keeping the word whole.
+function paragraph(segs, breaks) {
   const p = document.createElement('p');
+  let pos = 0;
+  let b = 0;
   for (const s of segs) {
     if (typeof s === 'string') {
-      p.append(s);
+      let from = 0;
+      for (; b < breaks.length && breaks[b] <= pos + s.length; b++) {
+        p.append(s.slice(from, breaks[b] - pos), document.createElement('br'));
+        from = breaks[b] - pos;
+      }
+      p.append(s.slice(from));
+      pos += s.length;
       continue;
     }
+    for (; b < breaks.length && breaks[b] <= pos; b++) p.append(document.createElement('br'));
     const [word, gloss, furi] = s;
     const r = document.createElement('ruby');
     r.className = 'jr';
@@ -53,6 +63,8 @@ function paragraph(segs) {
     }
     if (gloss) r.append(rt(gloss));
     p.append(r);
+    pos += word.length;
+    while (b < breaks.length && breaks[b] < pos) b++;
   }
   return p;
 }
@@ -69,14 +81,26 @@ async function update() {
   const text = $('text').value;
   $('count').textContent = text ? `${text.length.toLocaleString()} characters` : '';
   $('clear').disabled = !text;
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  // Paragraphs are separated by blank lines. The lines of a paragraph are analyzed as one text, since
+  // text copied from PDFs often breaks lines in the middle of a word.
+  const paras = [];
+  let para = null;
+  for (const line of text.split('\n')) {
+    const t = line.trim();
+    if (!t) para = null;
+    else {
+      if (!para) paras.push((para = { text: '', breaks: [] }));
+      else para.breaks.push(para.text.length);
+      para.text += t;
+    }
+  }
   const id = ++seq;
-  if (!lines.length) return note('Annotated text appears here as you type');
+  if (!paras.length) return note('Annotated text appears here as you type');
   if ($('result').querySelector('.empty')) note('Loading…'); // the dictionary takes a moment the first time
-  const res = await chrome.runtime.sendMessage({ texts: lines.map((l) => ['', l, '']) }).catch(() => null);
+  const res = await chrome.runtime.sendMessage({ texts: paras.map((p) => ['', p.text, '']) }).catch(() => null);
   if (id !== seq) return; // the text changed while this was being analyzed
   if (!res) return note('Something went wrong. Try reloading this page.');
-  $('result').replaceChildren(...res.map(paragraph));
+  $('result').replaceChildren(...res.map((segs, i) => paragraph(segs, paras[i].breaks)));
 }
 
 function fit() {
