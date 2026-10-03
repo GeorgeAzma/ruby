@@ -42,6 +42,18 @@ const io = new IntersectionObserver((entries) => {
   flush();
 }, { rootMargin: '100% 0px' });
 
+// Annotations far from the viewport are removed again, so memory stays flat on long pages (each
+// annotated word costs the browser ~15KB of layout). The restored text is picked up by `io` when it
+// comes back near, and the service worker's cache makes that instant. 4 screens away vs 1 for
+// annotating, so nothing flips back and forth; Chrome's scroll anchoring keeps the view steady.
+const far = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) continue;
+    far.unobserve(e.target);
+    for (const n of e.target.childNodes) if (n.nodeType === 3 && n.jrW) unwrap(n, true);
+  }
+}, { rootMargin: '400% 0px' });
+
 // Up to 16 characters of neighbouring inline text, so words split by markup (<b>山田</b>さん)
 // are analyzed in context. dir: -1 before, 1 after.
 const INLINE = /^(A|ABBR|B|BDI|BDO|CITE|DATA|DEL|DFN|EM|FONT|I|INS|LABEL|MARK|Q|S|SMALL|SPAN|STRONG|SUB|SUP|TIME|U|JP-W)$/;
@@ -107,6 +119,7 @@ function render(t, text, segs) {
   t.jrW = w;
   t.before(w);
   t.data = '';
+  if (t.parentNode.nodeType === 1) far.observe(t.parentNode);
   rendered = true;
 }
 
@@ -199,6 +212,7 @@ function setOn(value) {
   } else {
     mo.disconnect();
     io.disconnect();
+    far.disconnect();
     queue = [];
     setHovered(null);
     for (const root of [document, ...shadows]) {
