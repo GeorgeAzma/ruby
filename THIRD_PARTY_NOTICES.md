@@ -10,7 +10,7 @@ Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).
 
 - Project and documentation: https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project
 - Licence: https://www.edrdg.org/edrdg/licence.html and https://creativecommons.org/licenses/by-sa/4.0/
-- Version used: JMdict_e created 2026-09-29
+- Version used: JMdict_e created 2026-10-01
 - Changes: tools/build-dict.js condenses each entry to short English glosses with part-of-speech and
   frequency information, and replaces a few glosses with clearer ones (OVERRIDES in that file).
 - dict/jmdict.json is distributed under CC BY-SA 4.0. The EDRDG retains copyright of the JMdict data.
