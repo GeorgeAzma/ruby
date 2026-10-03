@@ -306,9 +306,13 @@ chrome.storage.onChanged.addListener((changes, area) => {
 chrome.runtime.onMessage.addListener((msg, sender, reply) => {
   if (msg === 'toggle' && consented) {
     setOn(!on);
-    offSites = offSites.filter((h) => h !== SITE);
-    if (!on) offSites.push(SITE);
-    chrome.storage.local.set({ offSites });
+    // Re-read the list first, so a change made in another tab in the meantime isn't lost
+    const off = !on;
+    chrome.storage.local.get({ offSites: [] }, (s) => {
+      const list = s.offSites.filter((h) => h !== SITE);
+      if (off) list.push(SITE);
+      chrome.storage.local.set({ offSites: list });
+    });
   }
   if (msg === 'toggle') reply(on);
   if (msg === 'state') reply({ on, site: SITE });
