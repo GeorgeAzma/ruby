@@ -1,12 +1,14 @@
 # Privacy Policy: Ruby: Inline Translate Japanese
 
-_Last updated: September 29, 2026_
+_Last updated: October 3, 2026_
 
 Ruby is a Chrome extension that shows English translations or furigana above Japanese words on the web pages you read. This policy explains what information Ruby handles and how. In short: everything happens on your device, and nothing is collected, sent, or shared.
 
 ## Information Ruby handles
 
 **Text of the pages you visit.** To find and annotate Japanese, Ruby reads the text of the web pages you open. This text is processed entirely on your device by the extension itself, using a dictionary that is built into the extension. Recently analyzed text is kept in memory for a short time to make repeated text faster. It is discarded when Ruby goes idle (after 10 minutes without Japanese text) or when you close the browser. Page text is never saved to disk, logged, or sent anywhere.
+
+**Text you paste into the Reader.** Ruby's Reader page annotates text you paste or type into it. That text is processed on your device in the same way, stays in that browser tab, and is gone when you close it. It is never saved, logged, or sent anywhere.
 
 **Your settings.** Ruby saves your display preferences (English or furigana, hover behavior, hold key, and text size) using Chrome's local extension storage. These settings stay on your device and are removed when you uninstall Ruby. Whether Ruby is turned on for the current page is kept only in memory and resets when the page reloads.
 
@@ -18,7 +20,7 @@ Ruby is a Chrome extension that shows English translations or furigana above Jap
 - It makes no network requests: no servers, analytics, advertising, cookies, or tracking.
 - It does not require an account.
 - It does not sell, share, or transfer any data to third parties.
-- It does not use data for any purpose other than showing annotations on the page you are reading, and never to determine creditworthiness or for lending.
+- It does not use data for any purpose other than showing annotations on the page you are reading or in the Reader, and never to determine creditworthiness or for lending.
 
 The popup and welcome page contain links to the dictionary's license and to a Ko-fi page where you can support the developer. These open only if you click them, and Ruby sends no information to them.
 

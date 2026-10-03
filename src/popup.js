@@ -92,6 +92,10 @@ chrome.commands.getAll().then((commands) => {
     if (kbd) kbd.textContent = c.shortcut;
   }
 });
+$('reader').addEventListener('click', (e) => {
+  e.preventDefault();
+  chrome.tabs.create({ url: chrome.runtime.getURL('src/reader.html') });
+});
 $('shortcuts').addEventListener('click', (e) => {
   e.preventDefault();
   chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });

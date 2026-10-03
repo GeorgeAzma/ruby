@@ -18,6 +18,7 @@ website. It runs entirely on your computer, works offline, and never sends the p
 - Furigana mode, over the kanji only
 - Hover to swap between English and furigana, or show annotations only on the word you hover, with an
   optional hold key
+- Reader page for text Ruby can't reach, such as PDFs and apps: paste it in to see it annotated
 - Adjustable text size, light and dark mode
 - Works on dynamic pages and web components, and only processes text near the screen
 

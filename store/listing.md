@@ -25,6 +25,7 @@ WHAT IT DOES
 • Hover to swap: hover a word to see its furigana, or its English in furigana mode.
 • Reveal mode: hide all annotations and show only the word you hover. Great for practice. Toggle it with Alt+H.
 • Optional hold key: make hovering work only while Shift, Ctrl or Alt is held.
+• Reader: paste Japanese from PDFs, apps or anywhere else and see it annotated the same way.
 • Adjustable text size, dark mode, and a clean settings panel.
 • Turn it off for a page with Alt+J.
 
