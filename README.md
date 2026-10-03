@@ -21,9 +21,7 @@ website. It runs entirely on your computer, works offline, and never sends the p
 - Adjustable text size, light and dark mode
 - Works on dynamic pages and web components, and only processes text near the screen
 
-## Install
-
-Chrome Web Store: coming soon.
+## [Install From Chrome Web Store](https://chromewebstore.google.com/detail/igpknamhbmnmndjdadabhjicioadhmol)
 
 To run it from source, open `chrome://extensions`, turn on Developer mode, click **Load unpacked** and
 choose this folder.
