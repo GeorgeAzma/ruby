@@ -96,8 +96,10 @@ async function update() {
   }
   const id = ++seq;
   if (!paras.length) return note('Annotated text appears here as you type');
-  if ($('result').querySelector('.empty')) note('Loading…'); // the dictionary takes a moment the first time
+  // The dictionary takes a moment to load the first time
+  const slow = setTimeout(() => id === seq && $('result').querySelector('.empty') && note('Loading…'), 300);
   const res = await chrome.runtime.sendMessage({ texts: paras.map((p) => ['', p.text, '']) }).catch(() => null);
+  clearTimeout(slow);
   if (id !== seq) return; // the text changed while this was being analyzed
   if (!res) return note('Something went wrong. Try reloading this page.');
   $('result').replaceChildren(...res.map((segs, i) => paragraph(segs, paras[i].breaks)));
@@ -127,12 +129,16 @@ $('clear').addEventListener('click', () => {
 
 // Hovering works like on a page
 let pointed = null;
+let hovered = null;
 function hover(e) {
   const active = settings.hoverMode !== 'off' && (!settings.hoverKey || e[`${settings.hoverKey}Key`]);
-  for (const r of $('result').querySelectorAll('ruby.jr')) {
-    r.classList.toggle('jr-h', active && r === pointed && settings.hoverMode === 'swap');
-    r.classList.toggle('jr-v', active && r === pointed && settings.hoverMode === 'reveal');
+  const word = active ? pointed : null;
+  if (hovered && hovered !== word) hovered.classList.remove('jr-h', 'jr-v');
+  if (word) {
+    word.classList.toggle('jr-h', settings.hoverMode === 'swap');
+    word.classList.toggle('jr-v', settings.hoverMode === 'reveal');
   }
+  hovered = word;
 }
 document.addEventListener('mouseover', (e) => {
   pointed = e.target.closest('#result ruby.jr');
