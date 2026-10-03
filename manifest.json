@@ -52,6 +52,9 @@
     "reveal": {
       "suggested_key": { "default": "Alt+H" },
       "description": "Show annotations only on hover (on/off)"
+    },
+    "reader": {
+      "description": "Open the Reader to paste your own text"
     }
   }
 }

@@ -458,6 +458,10 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     if (tab && tab.id >= 0) chrome.tabs.sendMessage(tab.id, 'toggle').catch(() => {});
     return;
   }
+  if (command === 'reader') {
+    chrome.tabs.create({ url: chrome.runtime.getURL('src/reader.html') });
+    return;
+  }
   // Settings are shared with content.js and popup.js (defaults as in content.js)
   const s = await chrome.storage.local.get({ furigana: false, hoverMode: 'swap', hoverModeBefore: 'swap' });
   if (command === 'furigana') await chrome.storage.local.set({ furigana: !s.furigana });

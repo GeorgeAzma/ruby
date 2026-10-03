@@ -36,6 +36,7 @@ KEYBOARD SHORTCUTS
 Alt+J: show or hide annotations on this page
 Alt+K: switch between English and furigana
 Alt+H: reveal mode (annotations only on hover)
+Open the Reader: not set by default
 Change them any time at chrome://extensions/shortcuts
 
 GOOD TO KNOW

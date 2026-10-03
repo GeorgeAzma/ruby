@@ -34,6 +34,7 @@ choose this folder.
 | Alt+J | Show or hide annotations on the current page |
 | Alt+K | Switch between English and furigana |
 | Alt+H | Show annotations only on hover |
+| Not set | Open the Reader |
 
 Change them at `chrome://extensions/shortcuts`.
 
